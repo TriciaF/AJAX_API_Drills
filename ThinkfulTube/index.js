@@ -1,56 +1,49 @@
 const YOU_TUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search';
 
 function getDataFromApi(searchTerm, callback) {
-    const query = {
-        part: 'snippet',
-        key: 'AIzaSyA3Ro1p7T4iSmzi9AzC_Wfxq9awF4QYyTA',
-        q: `${searchTerm}`,
-    };
-
-    /*
-      const query = {
-        type: 'GET',
-        url: YOU_TUBE_SEARCH_URL,
-        KEY: 'AIzaSyA3Ro1p7T4iSmzi9AzC_Wfxq9awF4QYyTA',
-        data: {
-          maxResults: '25',
-          part: 'snippet',
-          q: `${searchTerm}`,
-          type: 'video'
-        },
-      };
-        */
-    // q: `${searchTerm} in:name`,
-
-    debugger;
-    $.ajax(query);
+  const query = {
+    type: 'GET',
+    url: YOU_TUBE_SEARCH_URL,
+    success: callback,
+    data: {
+      maxResults: '25',
+      part: 'snippet',
+      q: `${searchTerm}`,
+      key: 'AIzaSyA3Ro1p7T4iSmzi9AzC_Wfxq9awF4QYyTA',
+      type: 'video'
+    },
+  };
+  $.ajax(query);
+  // $.getJSON(YOU_TUBE_SEARCH_URL, query, callback);
 }
 
 function renderResult(result) {
-    return `
-    <div>
-      <h2>
-      <a class="js-result-name" href="${result.html_url}" target="_blank">${result.name}</a> by <a class="js-user-name" href="${result.owner.html_url}" target="_blank">${result.owner.login}</a></h2>
-      <p>Number of watchers: <span class="js-watchers-count">${result.watchers_count}</span></p>
-      <p>Number of open issues: <span class="js-issues-count">${result.open_issues}</span></p>
-      </div>
-    `;
+  return `
+  <div>
+    <h2>
+    <a class="js-result-name">${result.snippet.title}</a></h2>
+    <p>Description: <span class="js-watchers-count">${result.snippet.description}</span></p>
+    <p>Channel Title: <span class="js-issues-count">${result.snippet['channelTitle']}</span></p>
+  </div>
+`;
 }
 
 function displayYouTubeSearchData(data) {
-    const results = data.items.map((item, index) => renderResult(item));
-    $('.js-search-results').html(results);
+  console.log(data);
+  const results = data.items.map((item, index) => renderResult(item));
+
+  $('.js-search-results').html(results);
 }
 
 function watchSubmit() {
-    $('.js-search-form').submit(event => {
-        event.preventDefault();
-        const queryTarget = $(event.currentTarget).find('.js-query');
-        const query = queryTarget.val();
-        // clear out the input
-        queryTarget.val('');
-        getDataFromApi(query, displayYouTubeSearchData);
-    });
+  $('.js-search-form').submit(event => {
+    event.preventDefault();
+    const queryTarget = $(event.currentTarget).find('.js-query');
+    const query = queryTarget.val();
+    // clear out the input
+    queryTarget.val('');
+    getDataFromApi(query, displayYouTubeSearchData);
+  });
 }
 
 $(watchSubmit);
